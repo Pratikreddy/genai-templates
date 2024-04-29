@@ -1,0 +1,30 @@
+from groq import Groq
+
+api_key = ""
+
+#inputs
+user_input = 
+sys_input = 
+
+client = Groq(api_key=api_key)
+completion = client.chat.completions.create(
+    model="mixtral-8x7b-32768",
+    messages=[
+        {
+            "role": "system",
+            "content": "Output only valid JSON object without any trailing or leading character's."
+        },
+        {
+            "role": "user",
+            "content": "top 10 football players"
+        }
+    ],
+    temperature=0.78,
+    max_tokens=1024,
+    top_p=1,
+    stream=False,
+    response_format={"type": "json_object"},
+    stop=None,
+)
+
+print(completion.choices[0].message)
