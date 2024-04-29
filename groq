@@ -27,4 +27,14 @@ completion = client.chat.completions.create(
     stop=None,
 )
 
-print(completion.choices[0].message)
+# This is the sample structure of the response ChoiceMessage(content='', role='assistant', tool_calls=None)
+#print(completion.choices[0].message)
+
+try:
+    content = completion.choices[0].message.content  # Access the JSON content directly
+    reply = json.loads(content)  # Convert JSON string to Python dictionary
+    print(reply)
+except AttributeError:
+    print("Error: The message content is not accessible.")
+except json.JSONDecodeError:
+    print("Error: The content is not properly formatted as JSON.")
