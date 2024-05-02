@@ -1,0 +1,57 @@
+import requests
+import json
+
+# URL for the Gemini API
+url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key="
+
+# System prompt for the AI model
+system_prompt = """give me a name, salary mothers origin country fathers origin country.
+"""
+
+# User prompt for the AI model
+user_prompt = """top 10 footballers
+"""
+
+# Function to interact with the Gemini API
+def gemini_json(system_prompt, user_prompt, url):
+    # Create a JSON payload for the API request
+    payload = json.dumps({
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": f"{system_prompt}"  # System prompt
+                    },
+                    {
+                        "text": f"{user_prompt}"  # User prompt
+                    },
+                    {
+                        "text": ""  # Empty text for response
+                    }
+                ]
+            }
+        ],
+        "generationConfig": {
+            "response_mime_type": "application/json"  # Response format
+        }
+    })
+
+    # Set the Content-Type header to application/json
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    # Send a POST request to the Gemini API
+    response = requests.request("POST", url, headers=headers, data=payload)
+    
+    # Parse the JSON response
+    response_data = response.json()
+    
+    # Extract the 'text' value from the first candidate's content
+    text_value = response_data["candidates"][0]["content"]["parts"][0]["text"]
+    
+    # Return the extracted string
+    return text_value
+
+# Call the gemini_json function with the system and user prompts
+gemini_json(system_prompt, user_prompt, url)
