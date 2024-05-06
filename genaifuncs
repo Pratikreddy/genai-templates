@@ -1,0 +1,161 @@
+#primary goal : to reduce development time and easy access to gen ai funcs this would serve as an insane test and refferal script.
+import requests
+import json
+from groq import Groq
+from openai import OpenAI
+import base64
+
+# System prompt for the AI model
+system_prompt = """
+"""
+# User prompt for the AI model
+user_prompt = """
+"""
+# expected output format for AI model to follow.
+expected_format = """
+"""
+
+
+#url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key="
+def gemini(system_prompt, user_prompt, expected_format, url):
+
+    payload = json.dumps({
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": f"system_prompt : {system_prompt}"  # System prompt
+                    },
+                    {
+                        "text": f"user_prompt : {user_prompt}"  # User prompt
+                    },
+                    {
+                        "text": f"expected_format : {expected_format}"  # Empty text for response
+                    }
+                ]
+            }
+        ],
+        "generationConfig": {
+            "response_mime_type": "application/json"  # Response format
+        }
+    })
+
+    # Set the Content-Type header to application/json
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    # Send a POST request to the Gemini API
+    response = requests.request("POST", url, headers=headers, data=payload)
+    
+    # Parse the JSON response
+    response_data = response.json()
+    
+    # Extract the 'text' value from the first candidate's content
+    text_value = response_data["candidates"][0]["content"]["parts"][0]["text"]
+    
+    # Return the extracted string
+    return text_value
+#gemini(system_prompt, user_prompt, url)
+
+
+#groqkey = ""
+def groq(system_prompt, user_prompt, expected_format, groqkey, model="llama3-70b-8192"):
+    
+    client = Groq(api_key=groqkey)
+    completion = client.chat.completions.create(
+        model=f"{model}",
+        messages=[
+            {
+                "role": "system",
+                "content": f"output only JSON object. {system_prompt}"
+            },
+            {
+                "role": "user",
+                "content": f"{expected_format}"
+            },
+            {
+                "role": "user",
+                "content": f"{user_prompt}"
+            }
+        ],
+        # temperature=0.78,
+        # max_tokens=1024,
+        # top_p=1,
+        # stream=False,
+        response_format={"type": "json_object"},
+        stop=None,
+    )
+
+    # This is the sample structure of the response ChoiceMessage(content='', role='assistant', tool_calls=None)
+    #print(completion.choices[0].message
+    content = completion.choices[0].message.content  # Access the JSON content directly
+    reply = json.loads(content)  # Convert JSON string to Python dictionary
+    print(reply)
+#groq(system_prompt,user_prompt,groqkey)
+
+
+#gptkey= ""
+def gpt(system_prompt, user_prompt, expected_format, gptkey, model="gpt-4-1106-preview"):
+
+    client = OpenAI(api_key=gptkey)
+    chat_completion, *_ = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": f"system_prompt : {system_prompt}"},
+            {"role": "user", "content": f"user_prompt : {user_prompt}"},
+            {"role": "user", "content": f"expected_JSON_format : {expected_format}"}
+        ],
+        model=f"{model}",
+        response_format={"type": "json_object"},
+    ).choices
+
+    content = chat_completion.message.content
+    print(content)
+    return content
+#gpt(system_prompt,user_prompt,expected_format="JSON",gptkey=gptkey)
+
+
+#gptvision helperfunc to encode images into base 64 which is the req format of the api.
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+#most models accept base64 with utf-8 always remember to check this.
+
+#gptkey= ""
+#imgpath = "/Users/p/Documents/auto3.png"
+def gptvision(system_prompt, user_prompt, expected_format, imgpath, gptkey,):
+    
+    base64_image = encode_image(imgpath)
+    headers = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {gptkey}"
+    }
+    payload = {
+    "model": "gpt-4-turbo",
+    "response_format": {"type": "json_object"},
+    "messages": [
+        {
+        "role": "user",
+        "content": [
+            {
+            "type": "text",
+            "text": f"system prompt : {system_prompt}, user_prompt : {user_prompt}, expected format : {expected_format}."
+            },
+            {
+            "type": "image_url",
+            "image_url": {
+                "url": f"data:image/jpeg;base64,{base64_image}"
+            }
+            }
+        ]
+        }
+    ],
+    "max_tokens": 300
+    }
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+    
+    #print(response.json())
+    return response.json()
+#gptvision(system_prompt, user_prompt,expected_format="JSON",imgpath=imgpath,gptkey=gptkey)
+#currrent outut "{'id': 'chatcmpl-9KYUjgXovQKDoiwCRtmTDUmSgjH4f', 'object': 'chat.completion', 'created': 1714686185, 'model': 'gpt-4-turbo-2024-04-09', 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': '{\n  "image_analysis": {\n    "content_description": "Screenshot showing a Visual Studio Code (VSCode) editor window. The editor displays a Python script named \'auto3.py\' which imports several libraries such as cv2, os, base64, and more. The script includes functionality related to video and audio editing, API interactions for OpenAI, file manipulation, and using YouTube API. Additionally, the bottom of the screen has a toolbar with various application icons visible, including Telegram, Adobe Photoshop, and others.",\n    "code_elements": {\n      "imported_libraries": [\n        "cv2",\n        "os",\n        "base64",\n        "openai",\n        "pathlib",\n        "moviepy.editor",\n        "requests",\n        "ffmpeg",\n        "subprocess",\n        "re",\n        "pytube"\n      ],\n      "mentioned_functions": [\n        "open_file",\n        "save_file"\n      ],\n      "themes": [\n        "API interactions",\n        "Video and audio file manipulation"\n      ],\n      "code_features": [\n        "API key handling",\n        "File reading and writing",\n        "Initialization of client with API key"\n      ]\n    },\n    "environment": {\n      "editor": "Visual Studio Code",\n      "datetime": "2023-01-04 3:49 PM",\n      "operating_system": "macOS",\n      "visible_applications": [\n        "Telegram",\n        "Adobe Photoshop",\n'}, 'logprobs': None, 'finish_reason': 'length'}], 'usage': {'prompt_tokens': 1133, 'completion_tokens': 300, 'total_tokens': 1433}, 'system_fingerprint': 'fp_5d12056990'}"
+
