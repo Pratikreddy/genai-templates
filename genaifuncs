@@ -115,7 +115,7 @@ def gpt(system_prompt, user_prompt, expected_format, gptkey, model="gpt-4-1106-p
 #gpt(system_prompt,user_prompt,expected_format="JSON",gptkey=gptkey)
 
 
-#gptvision helperfunc to encode images into base 64 which is the req format of the api.
+#vision helperfunc to encode images into base 64 which is the req format of the api.
 def encode_image(image_path):
   with open(image_path, "rb") as image_file:
     return base64.b64encode(image_file.read()).decode('utf-8')
