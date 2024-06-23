@@ -1,0 +1,59 @@
+import pathlib
+import os
+import google.generativeai as genai
+import mimetypes
+import base64
+
+# Configure the Gemini API key
+api_key = ""
+genai.configure(api_key=api_key)
+
+# Helper function to read image bytes and encode them in base64
+def read_image_base64(image_path):
+    with open(image_path, 'rb') as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+# Helper function to get MIME type based on file extension
+def get_mime_type(file_path):
+    mime_type, _ = mimetypes.guess_type(file_path)
+    return mime_type or 'application/octet-stream'
+
+# Function to process images in a folder and send to Gemini Vision API
+def process_images_in_folder_gemini(folder_path, prompt, model_name='gemini-1.5-flash'):
+    images = []
+    image_extensions = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.webp')
+
+    # Read image bytes in the folder and encode in base64
+    for root, _, files in os.walk(folder_path):
+        for file in files:
+            if file.lower().endswith(image_extensions):
+                image_path = os.path.join(root, file)
+                images.append({
+                    'mime_type': get_mime_type(image_path),
+                    'data': read_image_base64(image_path)
+                })
+
+    # Create model instance
+    model = genai.GenerativeModel(model_name)
+
+    # Prepare content
+    content = [prompt] + images
+
+    # Generate content
+    try:
+        response = model.generate_content(
+            content,
+            generation_config={"response_mime_type": "application/json"}
+        )
+        
+        # Print response
+        print(response.text)
+        
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Example usage
+folder_path = r"/Users/p/Desktop/images"  # Adjust the path to your images folder
+prompt = "extract all data ypu see in these images in a proper json format and make sure to keep the keys in english no matter what the language is"
+
+process_images_in_folder_gemini(folder_path, prompt)
