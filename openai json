@@ -2,6 +2,14 @@
 from openai import OpenAI
 
 
+# System prompt for the AI model
+system_prompt = """hi gpt
+"""
+# User prompt for the AI model
+user_prompt = """analyse the image 
+"""
+
+
 #gptkey= ""
 def gpt(system_prompt, user_prompt, expected_format, gptkey):
 
