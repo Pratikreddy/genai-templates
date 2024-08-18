@@ -1,3 +1,7 @@
+
+from openai import OpenAI
+
+
 #gptkey= ""
 def gpt(system_prompt, user_prompt, expected_format, gptkey):
 
