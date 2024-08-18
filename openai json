@@ -1,0 +1,18 @@
+#gptkey= ""
+def gpt(system_prompt, user_prompt, expected_format, gptkey):
+
+    client = OpenAI(api_key=gptkey)
+    chat_completion, *_ = client.chat.completions.create(
+        messages=[
+            {"role": "system", "content": f"system_prompt : {system_prompt}"},
+            {"role": "user", "content": f"user_prompt : {user_prompt}"},
+            {"role": "user", "content": f"expected_JSON_format : {expected_format}"}
+        ],
+        model="gpt-4-1106-preview",
+        response_format={"type": "json_object"},
+    ).choices
+
+    content = chat_completion.message.content
+    print(content)
+    return content
+#gpt(system_prompt,user_prompt,expected_format="JSON",gptkey=gptkey)
