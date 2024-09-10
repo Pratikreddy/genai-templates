@@ -1,0 +1,89 @@
+
+
+
+
+{
+  "contents": [
+    {
+      "role": string,
+      "parts": [
+        {
+          // Union field data can be only one of the following:
+          "text": string,
+          "inlineData": {
+            "mimeType": string,
+            "data": string
+          },
+          "fileData": {
+            "mimeType": string,
+            "fileUri": string
+          },
+          // End of list of possible types for union field data.
+
+          "videoMetadata": {
+            "startOffset": {
+              "seconds": integer,
+              "nanos": integer
+            },
+            "endOffset": {
+              "seconds": integer,
+              "nanos": integer
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "systemInstruction": {
+    "role": string,
+    "parts": [
+      {
+        "text": string
+      }
+    ]
+  },
+  "tools": [
+    {
+      "functionDeclarations": [
+        {
+          "name": string,
+          "description": string,
+          "parameters": {
+            object (OpenAPI Object Schema)
+          }
+        }
+      ]
+    }
+  ],
+  "safetySettings": [
+    {
+      "category": enum (HarmCategory),
+      "threshold": enum (HarmBlockThreshold)
+    }
+  ],
+  "generationConfig": {
+    "temperature": number,
+    "topP": number,
+    "topK": number,
+    "candidateCount": integer,
+    "maxOutputTokens": integer,
+    "presencePenalty": float,
+    "frequencyPenalty": float,
+    "stopSequences": [
+      string
+    ],
+    "responseMimeType": string,
+    "responseSchema": schema,
+    "seed": integer
+  }
+}
+
+
+models list as of september 1 week 
+Gemini 1.5 Flash	gemini-1.5-flash-001
+Gemini 1.5 Pro	gemini-1.5-pro-001
+Gemini 1.0 Pro Vision	gemini-1.0-pro-001
+gemini-1.0-pro-vision-001
+Gemini 1.0 Pro	gemini-1.0-pro
+gemini-1.0-pro-001
+gemini-1.0-pro-002
